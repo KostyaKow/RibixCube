@@ -10,26 +10,56 @@ public class Game : MonoBehaviour {
    private float left_to_rotate;
    public float rot_frame_angle;
 
-   public Vector3 align_helper;
+   private bool vert; private bool forward;
+   private int rotIndex;
+
+   //TODO: at the end of rotation
+   //void swapCubes(GameObject a, GameObject b) { }
 
 	// Update is called once per frame
 	void Update () {
       counter++;
-      if (counter % 300 == 0 || counter == 1) {
+      if (counter % 150 == 0 || counter == 1) {
+         vert = !vert;
          left_to_rotate += 90;
          //rotateStrip(counter % 3, true, true, 90);
 
+         forward = Random.Range(0, 10) > 5;
+         vert = Random.Range(0, 10) > 5;
+         rotIndex = (int)Mathf.Floor(Random.Range(0, 3));
          //var t = cubes[1].transform;
          //t.RotateAround(Vector3.zero, Vector3.up, 20 * Time.deltaTime);
       }
 
       if (left_to_rotate > 0) {
          left_to_rotate -= rot_frame_angle;
-         rotateStrip(0, false, true, rot_frame_angle);
+         rotateStrip(rotIndex, vert, forward, rot_frame_angle);
       }
+
 	}
 
-   //List<GameObject> getFace(string s) {} //BFUDLR
+   List<GameObject> getFace(string faceName) { //BFUDLR
+      var faces = new List<GameObject>();
+
+      for (int x = 0; x < 3; x++) {
+         for (int y = 0; y < 3; y++) {
+            for (int z = 0; z < 3; z++) {
+               var should_add_cube =
+                 (((z == 2) && faceName == "B") ||
+                  ((z == 0) && faceName == "F") ||
+                  ((y == 2) && faceName == "U") ||
+                  ((y == 0) && faceName == "D") ||
+                  ((x == 0) && faceName == "L") ||
+                  ((x == 2) && faceName == "R"));
+
+               var cube = cubes[x*9 + y*3 + z];
+               faces.Add(cube);
+            }
+         }
+      }
+      return faces;
+   }
+
    //bool isDone() {}
 
    //rotate row/column at index, vertically/horizontally, forward/backward
@@ -40,7 +70,7 @@ public class Game : MonoBehaviour {
       for (int x = 0; x < 3; x++) {
          for (int y = 0; y < 3; y++) {
             for (int z = 0; z < 3; z++) {
-               if ((vert && index == x) || (!vert && index == y))
+               if ((vert && (index == x)) || (!vert && (index == y)))
                   cubes_to_rotate.Add(cubes[x*3*3+y*3+z]);
             }
          }
@@ -53,7 +83,9 @@ public class Game : MonoBehaviour {
       //if (counter == 1) centralCubeT.transform.position += new Vector3(0, 3, 0);
 
       //(0, 0, 0); //(0.5f, 0.5f, 0.5f);
-      Vector3 alignV = align_helper;//new Vector3(-0.5f, 0, 1)/2 + new Vector3(0.29f, 0.1f, 0.075f);
+      //new Vector3(-0.5f, 0, 1)/2 + new Vector3(0.29f, 0.1f, 0.075f);
+      Vector3 alignV = new Vector3(0, 0, 0.5f); //(-0.1f, 0.1f, 0.43f); //0.575f);
+
       Vector3 rotatePoint = centralCubeT.position - alignV;
 
       if (vert) {
@@ -96,7 +128,9 @@ public class Game : MonoBehaviour {
                            j.ToString() + "-" +
                            k.ToString();
 
-               var moveV = new Vector3(i+0.05f*i, j+0.05f*j, k+0.05f*k);
+               float sub_cube_spacing = 0.05f; //0.01f; //0.05f;
+               var moveV = new Vector3(i, j, k) +
+                           (new Vector3(i, j, k) * sub_cube_spacing);
                sub.transform.position += moveV;
                cubes.Add(sub);
                if (k == 0) {
@@ -207,7 +241,7 @@ public class Game : MonoBehaviour {
    void initColors() {
       colors = new Dictionary<string, Color>();
       colors.Add("yellow", new Color(1, 1, 0));
-      colors.Add("orange", new Color(1, 0.8f, 0));
+      colors.Add("orange", new Color(1, 0.5f, 0));
       colors.Add("red", new Color(1, 0, 0));
       colors.Add("green", new Color(0, 1, 0));
       colors.Add("blue", new Color(0, 0, 1));
