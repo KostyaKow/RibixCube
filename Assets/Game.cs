@@ -10,6 +10,8 @@ public class Game : MonoBehaviour {
    private float left_to_rotate;
    public float rot_frame_angle;
 
+   public Vector3 align_helper;
+
 	// Update is called once per frame
 	void Update () {
       counter++;
@@ -50,7 +52,8 @@ public class Game : MonoBehaviour {
       //move central square up to check if we got right now
       //if (counter == 1) centralCubeT.transform.position += new Vector3(0, 3, 0);
 
-      Vector3 alignV = new Vector3(0, 0, 0); //(0.5f, 0.5f, 0.5f);
+      //(0, 0, 0); //(0.5f, 0.5f, 0.5f);
+      Vector3 alignV = align_helper;//new Vector3(-0.5f, 0, 1)/2 + new Vector3(0.29f, 0.1f, 0.075f);
       Vector3 rotatePoint = centralCubeT.position - alignV;
 
       if (vert) {
